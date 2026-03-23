@@ -1,0 +1,132 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Соловьиный Пруд</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        @keyframes smoothReveal {
+            0% {
+                opacity: 0;
+                transform: translateY(20px) scale(0.98);
+                filter: blur(3px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+                filter: blur(0);
+            }
+        }
+
+        .reveal-item {
+            opacity: 0;
+            transition: none;
+        }
+
+        .reveal-item.active {
+            animation: smoothReveal 2.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .delay-100 { animation-delay: 0.1s; }
+        .delay-200 { animation-delay: 0.2s; }
+        .delay-300 { animation-delay: 0.3s; }
+    </style>
+</head>
+<body class="bg-white text-zinc-900 antialiased flex flex-col min-h-screen">
+    <nav class="flex flex-col md:flex-row justify-between items-center p-6 sm:p-8 md:p-12 border-b border-emerald-50 bg-white gap-6 md:gap-0 text-center md:text-left">
+        <a href="{% url 'index' %}" class="group flex items-center justify-center md:justify-start gap-3 sm:gap-4">
+            
+            <img src="{% static 'img/logo.svg' %}" 
+                 alt="Логотип" 
+                 class="h-10 sm:h-12 md:h-14 w-auto object-contain transition-opacity duration-300 group-hover:opacity-80">
+            
+            <div class="text-xl sm:text-2xl font-light tracking-tighter leading-[0.9] text-zinc-800 group-hover:text-emerald-800 transition text-left">
+                Соловьиный<br class="hidden sm:block"><span class="text-emerald-200 group-hover:text-emerald-400">Пруд</span>
+            </div>
+            
+        </a>
+
+        <div class="flex flex-wrap justify-center gap-4 sm:gap-8 md:gap-12 text-[10px] sm:text-[11px] uppercase tracking-[0.2em] text-zinc-400 font-medium">
+            <a href="{% url 'index' %}" class="hover:text-emerald-800 transition {% if request.resolver_match.url_name == 'index' %}text-emerald-900{% endif %}">Галерея</a>
+            <a href="{% url 'events' %}" class="hover:text-emerald-800 transition {% if request.resolver_match.url_name == 'events' %}text-emerald-900{% endif %}">Мероприятия</a>
+            <a href="{% url 'about' %}" class="hover:text-emerald-800 transition {% if request.resolver_match.url_name == 'about' %}text-emerald-900{% endif %}">О проекте</a>
+        </div>
+    </nav>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="p-6 sm:p-8 md:p-12 mt-auto border-t border-zinc-100">
+        <div class="max-w-6xl mx-auto">
+            
+            <div id="contacts" class="pt-6 md:pt-8 pb-10 grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12">
+                
+                <div class="md:col-span-3 flex flex-col gap-8 text-center md:text-left">
+                    <div>
+                        <h4 class="text-[10px] uppercase tracking-widest text-zinc-400 mb-2">Локация</h4>
+                        <p class="text-sm font-light text-zinc-600">ул. Горького, 79А, Владимир</p>
+                    </div>
+
+                    <div>
+                        <h4 class="text-[10px] uppercase tracking-widest text-zinc-400 mb-2">Связь с нами</h4>
+                        <a href="mailto:KITP@mail.ru" 
+                        class="text-sm font-light underline decoration-zinc-200 underline-offset-4 hover:text-emerald-600 transition-colors">
+                            KITP@mail.ru
+                        </a>
+                    </div>
+
+                    <div>
+                        <h4 class="text-[10px] uppercase tracking-widest text-zinc-400 mb-2">Сообщество</h4>
+                        <div class="flex flex-col gap-2 text-sm font-light text-zinc-600">
+                            <a href="https://kitp.vlsu.ru/" target="_blank" class="hover:text-emerald-600 transition w-fit mx-auto md:ml-0">КИТП ВлГУ</a>
+                            <a href="https://vk.com/college.vlsu" target="_blank" class="hover:text-emerald-600 transition w-fit mx-auto md:ml-0">ВКонтакте</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="md:col-span-9 h-[200px] md:h-[250px] bg-zinc-50 relative group overflow-hidden">
+                    <div class="absolute inset-0 z-10 bg-transparent pointer-events-auto group-focus-within:pointer-events-none" onclick="this.style.display='none'"></div>
+                    
+                    <iframe 
+                        title="map"
+                        src="https://yandex.ru/map-widget/v1/?ll=40.384797%2C56.143990&mode=whatshere&whatshere%5Bpoint%5D=40.383016%2C56.143726&whatshere%5Bzoom%5D=16.42&z=16.42" 
+                        width="100%" 
+                        height="100%" 
+                        allowfullscreen="true" 
+                        class="w-full h-full"
+                        style="position:relative;">
+                    </iframe>
+                </div>
+            </div>
+
+            <div class="pt-8 border-t border-zinc-50 text-[10px] uppercase tracking-widest text-zinc-400 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div class="text-center sm:text-left">Овчинникова Ульяна & Соенкова Лилиана / ИРсп-123</div>
+                <div>2026</div>
+            </div>
+
+        </div>
+    </footer>
+
+    <script>
+        const observerOptions = {
+            threshold: 0.1 // Анимация начнется, когда 10% элемента будет видно
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, observerOptions);
+
+        // Ищем все элементы с классом reveal-item и подписываем на слежку
+        document.querySelectorAll('.reveal-item').forEach(el => observer.observe(el));
+    </script>
+</body>
+</html>

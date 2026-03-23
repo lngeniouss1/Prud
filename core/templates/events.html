@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="p-6 sm:p-8 md:p-12 bg-white min-h-screen">
+    <div class="max-w-6xl mx-auto">
+        
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 md:mb-20 border-b border-emerald-50 pb-8 md:pb-10 gap-4 md:gap-0">
+            <div>
+                <h2 class="text-[10px] sm:text-xs uppercase tracking-[0.3em] text-emerald-300 mb-2 sm:mb-4">Программа мероприятий</h2>
+                <h1 class="text-3xl sm:text-4xl font-light text-zinc-800 tracking-tighter">События на <span class="text-emerald-600">Соловьином пруду</span></h1>
+            </div>
+            <div class="text-[9px] sm:text-[10px] uppercase tracking-widest text-zinc-400">
+                Сезон 2025/2026
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 gap-16 md:gap-24">
+            {% for event in events %}
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 items-stretch group reveal-item">
+                
+                <div class="md:col-span-2 pt-1 flex md:flex-col items-center md:items-start gap-4 md:gap-0 border-b md:border-b-0 border-emerald-50 pb-4 md:pb-0">
+                    <span class="text-4xl md:text-3xl font-light text-emerald-900 leading-none">
+                        {{ event.date|date:"d.m" }}
+                    </span>
+                    <p class="text-[9px] md:text-[10px] uppercase tracking-widest text-zinc-400 md:mt-3 font-medium text-left">
+                        {{ event.date|date:"l" }}<br class="hidden md:block">
+                        <span class="md:hidden">, </span>{{ event.date|date:"H:i" }}
+                    </p>
+                </div>
+
+                <div class="md:col-span-6 border-l-2 md:border-l border-emerald-100 pl-4 md:pl-8 flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-xl md:text-2xl font-light mb-3 md:mb-5 group-hover:text-emerald-700 transition duration-500 leading-tight">
+                            {{ event.title }}
+                        </h3>
+                        <div class="text-zinc-500 font-light leading-relaxed text-sm max-w-md">
+                            {{ event.description|linebreaks }}
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 md:mt-8">
+                        <a href="{{ event.registration_url }}" target="_blank" 
+                           class="inline-block text-[10px] uppercase tracking-[0.2em] border border-zinc-200 px-6 sm:px-8 py-3 hover:border-zinc-800 hover:bg-zinc-800 hover:text-white transition duration-300">
+                            Подробнее
+                        </a>
+                    </div>
+                </div>
+
+                <div class="md:col-span-4 mt-4 md:mt-0">
+                    <div class="w-full h-full min-h-[200px] md:min-h-[250px] overflow-hidden bg-emerald-50">
+                        <img src="{{ event.image_url }}" 
+                             alt="{{ event.title }}"
+                             class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition duration-1000 scale-105 group-hover:scale-100">
+                    </div>
+                </div>
+
+            </div>
+            
+            {% if not forloop.last %}
+                <div class="h-px bg-emerald-50 w-full"></div>
+            {% endif %}
+
+            {% empty %}
+            <div class="py-20 md:py-32 text-center border-2 border-dashed border-emerald-50 rounded-lg px-4">
+                <p class="text-zinc-400 font-light italic text-sm md:text-base">На данный момент программа формируется.</p>
+                <a href="/admin" class="text-emerald-600 text-[10px] uppercase tracking-widest mt-6 inline-block hover:underline">
+                    Добавить событие в админке
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}
