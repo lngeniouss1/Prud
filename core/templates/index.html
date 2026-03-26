@@ -13,44 +13,39 @@
             Живописная природа, место для отдыха и встреч в самом сердце города
         </p>
         <p class="text-zinc-500 text-[13px] md:text-[15px] font-light leading-relaxed max-w-sm text-left mt-6">
-            Это идеальное пространство для неспешных семейных прогулок. Здесь можно провести время с детьми на свежем воздухе, понаблюдать за местными уточками или просто насладиться моментом спокойствия в тени деревьев, отдыхая от ритма мегаполиса.
+            Это идеальное пространство для неспешных семейных прогулок. Здесь можно провести время с детьми на свежем воздухе, понаблюдать за местными уточками или просто насладиться моментом спокойствия.
         </p>
     </div>
 
     <div class="md:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-        <div class="relative group overflow-hidden bg-emerald-100/20 aspect-[4/3] sm:aspect-[3/4]">
+        <div class="relative group overflow-hidden bg-emerald-50 aspect-[4/3] sm:aspect-[3/4] rounded-sm">
             <img id="photo-1" 
                  src="{% static 'img/foto1.jpg' %}" 
-                 alt="Вид на беседку"
-                 style="opacity: 1; transform: scale(1); transition: opacity 0.4s ease, transform 0.4s ease, filter 1s ease;"
-                 class="object-cover w-full h-full grayscale group-hover:grayscale-0">
+                 alt="Вид на пруд" 
+                 class="object-cover w-full h-full transition-all duration-1000 ease-in-out hover:scale-110 opacity-100">
         </div>
         
-        <div class="relative group overflow-hidden bg-emerald-100/20 aspect-[4/3] sm:aspect-[3/4] sm:mt-12">
+        <div class="relative group overflow-hidden bg-emerald-50 aspect-[4/3] sm:aspect-[3/4] sm:mt-12 rounded-sm">
             <img id="photo-2" 
                  src="{% static 'img/foto2.jpg' %}"
-                 alt="Вид на озеро" 
-                 style="opacity: 1; transform: scale(1); transition: opacity 0.4s ease, transform 0.4s ease, filter 1s ease;"
-                 class="object-cover w-full h-full grayscale group-hover:grayscale-0">
+                 alt="Природа" 
+                 class="object-cover w-full h-full transition-all duration-1000 ease-in-out hover:scale-110 opacity-100">
         </div>
     </div>
 </section>
 
 <div class="flex flex-wrap justify-center gap-3 sm:gap-4 md:gap-8 py-10 md:py-16 border-t border-emerald-50 px-4">
-    <button onclick="setSlide(0, event)" class="slide-btn active group flex flex-col items-center">
-        <div class="px-6 sm:px-8 py-2 sm:py-3 border border-emerald-800 text-emerald-900 text-[10px] sm:text-xs uppercase tracking-widest transition-all btn-label bg-emerald-50/50">01</div>
+    <button onclick="handleManualSlide(0, event)" class="slide-btn group flex flex-col items-center">
+        <div class="px-6 sm:px-8 py-2 sm:py-3 border border-emerald-800 text-emerald-900 bg-emerald-50/50 text-[10px] sm:text-xs uppercase tracking-widest transition-all btn-label hover:border-emerald-400">01</div>
     </button>
-    
-    <button onclick="setSlide(1, event)" class="slide-btn group flex flex-col items-center">
-        <div class="px-6 sm:px-8 py-2 sm:py-3 border border-emerald-100 text-zinc-400 text-[10px] sm:text-xs uppercase tracking-widest hover:border-emerald-400 hover:text-emerald-800 transition-all btn-label">02</div>
+    <button onclick="handleManualSlide(1, event)" class="slide-btn group flex flex-col items-center">
+        <div class="px-6 sm:px-8 py-2 sm:py-3 border border-emerald-100 text-zinc-400 text-[10px] sm:text-xs uppercase tracking-widest transition-all btn-label hover:border-emerald-400">02</div>
     </button>
-
-    <button onclick="setSlide(2, event)" class="slide-btn group flex flex-col items-center">
-        <div class="px-6 sm:px-8 py-2 sm:py-3 border border-emerald-100 text-zinc-400 text-[10px] sm:text-xs uppercase tracking-widest hover:border-emerald-400 hover:text-emerald-800 transition-all btn-label">03</div>
+    <button onclick="handleManualSlide(2, event)" class="slide-btn group flex flex-col items-center">
+        <div class="px-6 sm:px-8 py-2 sm:py-3 border border-emerald-100 text-zinc-400 text-[10px] sm:text-xs uppercase tracking-widest transition-all btn-label hover:border-emerald-400">03</div>
     </button>
-
-    <button onclick="setSlide(3, event)" class="slide-btn group flex flex-col items-center">
-        <div class="px-6 sm:px-8 py-2 sm:py-3 border border-emerald-100 text-zinc-400 text-[10px] sm:text-xs uppercase tracking-widest hover:border-emerald-400 hover:text-emerald-800 transition-all btn-label">04</div>
+    <button onclick="handleManualSlide(3, event)" class="slide-btn group flex flex-col items-center">
+        <div class="px-6 sm:px-8 py-2 sm:py-3 border border-emerald-100 text-zinc-400 text-[10px] sm:text-xs uppercase tracking-widest transition-all btn-label hover:border-emerald-400">04</div>
     </button>
 </div>
 
@@ -63,51 +58,73 @@
         "{% static 'img/foto5.jpg' %}"
     ];
 
-    // Флаг, чтобы блокировать нажатия, пока идет анимация
+    let currentIndex = 0;
     let isAnimating = false;
+    let autoSlideInterval;
 
-    function setSlide(index, event) {
-        if (isAnimating) return; // Если анимация уже идет, игнорируем клик
+    function setSlide(index, event = null) {
+        if (isAnimating) return;
         isAnimating = true;
+        currentIndex = index;
 
         const photo1 = document.getElementById('photo-1');
         const photo2 = document.getElementById('photo-2');
+        const nextIndex = (index + 1) % photos.length;
 
-        // 1. Уводим картинки в прозрачность и немного уменьшаем
+      
         photo1.style.opacity = '0';
-        photo1.style.transform = 'scale(0.95)';
-        
+        photo1.style.transform = 'scale(0.98)';
         photo2.style.opacity = '0';
-        photo2.style.transform = 'scale(0.95)';
+        photo2.style.transform = 'scale(0.98)';
 
-        // Обновляем стили кнопок сразу
-        document.querySelectorAll('.slide-btn .btn-label').forEach(el => {
-            el.classList.remove('border-emerald-800', 'text-emerald-900', 'bg-emerald-50/50');
-            el.classList.add('border-emerald-100', 'text-zinc-400');
+        
+        const labels = document.querySelectorAll('.btn-label');
+        labels.forEach((el, i) => {
+            if (i === index) {
+                el.classList.remove('border-emerald-100', 'text-zinc-400');
+                el.classList.add('border-emerald-800', 'text-emerald-900', 'bg-emerald-50/50');
+            } else {
+                el.classList.remove('border-emerald-800', 'text-emerald-900', 'bg-emerald-50/50');
+                el.classList.add('border-emerald-100', 'text-zinc-400');
+            }
         });
-        const activeLabel = event.currentTarget.querySelector('.btn-label');
-        activeLabel.classList.remove('border-emerald-100', 'text-zinc-400');
-        activeLabel.classList.add('border-emerald-800', 'text-emerald-900', 'bg-emerald-50/50');
 
-        // 2. Ждем 400мс (пока CSS анимация скрывает картинку)
         setTimeout(() => {
-            // Подменяем источник фото
             photo1.src = photos[index];
-            photo2.src = photos[index + 1];
+            photo2.src = photos[nextIndex];
 
-            // Возвращаем непрозрачность и исходный масштаб
+        
             photo1.style.opacity = '1';
             photo1.style.transform = 'scale(1)';
-            
             photo2.style.opacity = '1';
             photo2.style.transform = 'scale(1)';
 
-            // Снимаем блокировку кликов после завершения появления (еще 400мс)
             setTimeout(() => {
                 isAnimating = false;
-            }, 400);
-
-        }, 400); 
+            }, 600);
+        }, 400);
     }
+
+    function handleManualSlide(index, event) {
+        clearInterval(autoSlideInterval);
+        setSlide(index, event);
+        startAutoSlide(); 
+    }
+
+    function startAutoSlide() {
+        autoSlideInterval = setInterval(() => {
+            let next = (currentIndex + 1) % 4;
+            setSlide(next);
+        }, 10000);
+    }
+
+
+    window.onload = startAutoSlide;
 </script>
+
+<style>
+    #photo-1, #photo-2 {
+        transition: opacity 0.5s ease, transform 0.5s ease, filter 1s ease;
+    }
+</style>
 {% endblock %}

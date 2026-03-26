@@ -1,10 +1,11 @@
-from django.db import models
+from django.db import migrations, models
+
 class Event(models.Model):
     title = models.CharField(max_length=200)
-    date = models.DateTimeField()
     description = models.TextField()
-    image_url = models.URLField()  # Ссылка на картинку
-    registration_url = models.URLField() # Ссылка для кнопки "Записаться"
+    date = models.DateTimeField()
+    image = models.ImageField(upload_to='events/') 
+    registration_url = models.URLField(blank=True)
 
-    def __str__(self):
+    def __clstr__(self):
         return self.title
