@@ -51,9 +51,10 @@
         </a>
 
         <div class="flex flex-wrap justify-center gap-4 sm:gap-8 md:gap-12 text-[10px] sm:text-[11px] uppercase tracking-[0.2em] text-zinc-400 font-medium">
-            <a href="{% url 'index' %}" class="hover:text-emerald-800 transition {% if request.resolver_match.url_name == 'index' %}text-emerald-900{% endif %}">Галерея</a>
-            <a href="{% url 'events' %}" class="hover:text-emerald-800 transition {% if request.resolver_match.url_name == 'events' %}text-emerald-900{% endif %}">Мероприятия</a>
-            <a href="{% url 'about' %}" class="hover:text-emerald-800 transition {% if request.resolver_match.url_name == 'about' %}text-emerald-900{% endif %}">О проекте</a>
+            <a href="/" class="text-[10px] uppercase tracking-[0.2em] text-zinc-800 hover:text-emerald-600 transition-colors">Главная</a>
+    <a href="/events/" class="text-[10px] uppercase tracking-[0.2em] text-zinc-800 hover:text-emerald-600 transition-colors">Мероприятия</a>
+    <a href="{% url 'partners' %}" class="text-[10px] uppercase tracking-[0.2em] text-zinc-800 hover:text-emerald-600 transition-colors">Партнеры</a>
+    <a href="/about/" class="text-[10px] uppercase tracking-[0.2em] text-zinc-800 hover:text-emerald-600 transition-colors">О проекте</a>
         </div>
     </nav>
 
@@ -114,7 +115,7 @@
 
     <script>
         const observerOptions = {
-            threshold: 0.1 // Анимация начнется, когда 10% элемента будет видно
+            threshold: 0.1 
         };
 
         const observer = new IntersectionObserver((entries) => {
@@ -125,7 +126,6 @@
             });
         }, observerOptions);
 
-        // Ищем все элементы с классом reveal-item и подписываем на слежку
         document.querySelectorAll('.reveal-item').forEach(el => observer.observe(el));
     </script>
 </body>

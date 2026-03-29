@@ -1,5 +1,9 @@
 from django.shortcuts import render
-from .models import Event 
+from .models import Event, PartnerPhoto
+
+def partners_view(request):
+    photos = PartnerPhoto.objects.all().order_by('-uploaded_at')
+    return render(request, 'partners.html', {'photos': photos})
 
 def index(request):
     return render(request, 'index.html')
