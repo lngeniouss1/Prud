@@ -25,6 +25,10 @@ SECRET_KEY = 'django-insecure-6&pc@uc21-)y6b$hara&fjbl&%1ec4qa_b3@!s*5r%87fi*6)%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+ALLOWED_HOSTS = [
+    'prud.bubucode.ru'
+]
+
 ALLOWED_HOSTS = []
 
 
@@ -120,7 +124,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
-
+STATICFILES_DIRS = [
+    BASE_DIR / 'img',
+]
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
