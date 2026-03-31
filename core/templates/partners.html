@@ -2,111 +2,104 @@
 {% load static %}
 
 {% block content %}
+<style>
+    html { scroll-behavior: smooth; }
+    .reveal-item { animation: fadeInUp 0.8s ease-out; }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .break-inside-avoid { break-inside: avoid; }
+    
+    .custom-select {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2310b981'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+        background-size: 1em;
+    }
+
+    /* Стили для длинного текста на всю ширину */
+    .partner-description {
+        line-height: 1.8;
+        color: #4b5563; /* чуть темнее для лучшей читаемости (zinc-600) */
+        font-size: 1rem;
+        text-align: justify; /* выравнивание по ширине для красоты */
+    }
+</style>
+
 <section class="p-6 sm:p-8 md:p-12 bg-white min-h-screen reveal-item">
     <div class="max-w-6xl mx-auto">
         
-        <div class="mb-16 md:mb-24 border-b border-emerald-50 pb-10">
-            <h2 class="text-[10px] uppercase tracking-[0.4em] text-emerald-300 mb-4 font-medium">Коллаборации и дружба</h2>
-            <h1 class="text-4xl md:text-6xl font-light text-zinc-800 tracking-tighter">
+        <div class="mb-16 border-b border-emerald-50 pb-10">
+            <h2 class="text-[10px] uppercase tracking-[0.4em] text-emerald-300 mb-4 font-medium">Наше сообщество</h2>
+            <h1 class="text-4xl md:text-6xl font-light text-zinc-800 tracking-tighter mb-8">
                 Наши <span class="text-emerald-600 italic">Партнеры</span>
             </h1>
+
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 mt-8">
+                <label for="partner-select" class="text-[10px] uppercase tracking-widest text-zinc-400 font-bold">Перейти к:</label>
+                <select id="partner-select" 
+                        onchange="if(this.value) window.location.hash = this.value;" 
+                        class="custom-select w-full sm:w-80 bg-zinc-50 border border-zinc-200 text-zinc-800 text-[11px] uppercase tracking-widest p-3 px-4 rounded-sm focus:outline-none focus:border-emerald-500 cursor-pointer shadow-sm">
+                    <option value="">Наши партнеры:</option>
+                    <option value="NarodnFront">Алексей Мокеев</option>
+                    <option value="RGO">Молодёжный клуб РГО «Владимир»</option>
+                    <option value="BPS">БПС г.Владимир</option>
+                    <option value="Veles">Велес</option>
+                    <option value="IET">Институт экономии и туризма</option>
+                    <option value="ARH">ИАСиЭ</option>
+                    <option value="vinogradova">Ирина Виноградова</option>
+                    <option value="School">МБОУ СОШ №19</option>
+                </select>
+            </div>
         </div>
 
-        <div class="mb-32">
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-8 mb-12 items-end">
-                <div class="md:col-span-5">
-                    <h3 class="text-2xl font-light text-zinc-800 mb-4">Фотограф Ирина Виноградова</h3>
-                    <p class="text-zinc-500 font-light leading-relaxed text-sm">
-                        Мастер репортажной съемки, которая умеет ловить свет и искренние улыбки наших гостей. 
-                        Её работы помогают нам сохранить историю Соловьиного пруда.
-                    </p>
-                </div>
-                <div class="md:col-span-7 h-px bg-emerald-50 mb-2"></div>
-            </div>
+        {% regroup photos by get_partner_slug_display as partner_list %}
 
-            <div class="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6">
-                {% for photo in photos %}
-                    {% if photo.partner_slug == 'vinogradova' %}
-                    <div class="relative group overflow-hidden bg-zinc-50 rounded-sm break-inside-avoid shadow-sm">
-                        <img src="{{ photo.image.url }}" alt="{{ photo.title }}" 
-                             class="w-full h-auto object-cover transition-transform duration-1000 group-hover:scale-110">
-                        {% if photo.title %}
-                        <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
-                            <p class="text-white text-[10px] uppercase tracking-widest">{{ photo.title }}</p>
+        {% for partner in partner_list %}
+            <div class="mb-32 scroll-mt-24" id="{{ partner.list.0.partner_slug }}">
+                
+                <div class="mb-12">
+                    <h3 class="text-3xl font-light text-zinc-800 mb-8 uppercase tracking-tight">
+                        {{ partner.grouper }}
+                    </h3>
+                    
+                    {% if partner.list.0.partner_description %}
+                    <div class="partner-description mb-10 w-full">
+                        {{ partner.list.0.partner_description|linebreaks }}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="w-20 h-1 bg-emerald-500"></div>
+                </div>
+
+                <div class="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6">
+                    {% for item in partner.list %}
+                    <div class="relative group overflow-hidden bg-zinc-50 rounded-sm break-inside-avoid shadow-sm hover:shadow-xl transition-all duration-500">
+                        
+                        {% if item.video_file %}
+                            <video controls poster="{{ item.image.url }}" class="w-full h-auto bg-black">
+                                <source src="{{ item.video_file.url }}" type="video/mp4">
+                            </video>
+                        {% else %}
+                            <img src="{{ item.image.url }}" alt="{{ item.title }}" 
+                                 class="w-full h-auto object-cover transition-transform duration-1000 group-hover:scale-105">
+                        {% endif %}
+
+                        {% if item.title %}
+                        <div class="{% if not item.video_file %}absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity{% else %}p-4 bg-white border-t border-zinc-50{% endif %} flex items-end">
+                            <p class="{% if not item.video_file %}text-white p-6{% else %}text-zinc-500{% endif %} text-[10px] uppercase tracking-[0.2em]">
+                                {% if item.video_file %}<span class="text-emerald-500 font-bold">VIDEO:</span> {% endif %}{{ item.title }}
+                            </p>
                         </div>
                         {% endif %}
                     </div>
-                    {% endif %}
-                {% endfor %}
-            </div>
-        </div>
-
-        <div class="mb-32">
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-8 mb-12 items-end">
-                <div class="md:col-span-5">
-                    <h3 class="text-2xl font-light text-zinc-800 mb-4">Институт экономики и туризма</h3>
-                    <p class="text-zinc-500 font-light leading-relaxed text-sm">
-                        25 апреля студенты групп БИ-122 и ГД-124 Института экономики и туризма приняли участие в субботнике по благоустройству территории у Соловьиного пруда
-                    </p>
+                    {% endfor %}
                 </div>
-                <div class="md:col-span-7 h-px bg-emerald-50 mb-2"></div>
             </div>
-
-            <div class="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6">
-                {% for photo in photos %}
-                    {% if photo.partner_slug == 'IET' %}
-                    <div class="relative group overflow-hidden bg-zinc-50 rounded-sm break-inside-avoid shadow-sm">
-                        <img src="{{ photo.image.url }}" alt="{{ photo.title }}" 
-                             class="w-full h-auto object-cover transition-transform duration-1000 group-hover:scale-110">
-                    </div>
-                    {% endif %}
-                {% endfor %}
+        {% empty %}
+            <div class="text-center py-20">
+                <p class="text-zinc-400 italic">Раздел пополняется...</p>
             </div>
-        </div>
+        {% endfor %}
 
-        <div class="mb-32">
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-8 mb-12 items-end">
-                <div class="md:col-span-5">
-                    <h3 class="text-2xl font-light text-zinc-800 mb-4">Отряд имени Андрея Дубенского</h3>
-                    <p class="text-zinc-500 font-light leading-relaxed text-sm">
-                        Татиана Петровна, местный активист и неравнодушный житель- ходатай за судьбу Соловьиного прудика, вновь позвала наших следопытов на труды праведны: ребятки дорогие, приходите - подсобите! Уточек навестите и порядок наведите!
-                    </p>
-                </div>
-                <div class="md:col-span-7 h-px bg-emerald-50 mb-2"></div>
-            </div>
-
-            <div class="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6">
-                {% for photo in photos %}
-                    {% if photo.partner_slug == 'BPS' %}
-                    <div class="relative group overflow-hidden bg-zinc-50 rounded-sm break-inside-avoid shadow-sm">
-                        <img src="{{ photo.image.url }}" alt="{{ photo.title }}" 
-                             class="w-full h-auto object-cover transition-transform duration-1000 group-hover:scale-110">
-                    </div>
-                    {% endif %}
-                {% endfor %}
-            </div>
-        </div>
-
-        <div class="py-20 border-t border-emerald-50 text-center">
-            <h4 class="text-zinc-400 text-xs uppercase tracking-[0.3em] mb-6">Хотите стать нашим партнером?</h4>
-            <a href="mailto:mail@example.com" class="inline-block px-10 py-4 border border-emerald-800 text-emerald-900 text-[10px] uppercase tracking-widest hover:bg-emerald-800 hover:text-white transition-all duration-500">
-                Написать нам
-            </a>
-        </div>
-
-    </div>
 </section>
-
-<style>
-    .reveal-item {
-        animation: fadeInUp 1s ease-out;
-    }
-    @keyframes fadeInUp {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-    .break-inside-avoid {
-        break-inside: avoid;
-    }
-</style>
 {% endblock %}

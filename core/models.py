@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.validators import FileExtensionValidator
 from PIL import Image
 import os
 
@@ -17,26 +18,55 @@ class Event(models.Model):
         return self.title
 
 class PartnerPhoto(models.Model):
-    # Список партнеров для выбора в админке
     PARTNER_CHOICES = [
-        ('vinogradova', 'Ирина Виноградова'),
+        ('NarodnFront', 'Алексей Мокеев'),
+        ('RGO', 'Молодёжный клуб РГО «Владимир»'),
+        ('BPS', 'БПС г.Владимир. Отряд имени Андрея Дубенского'),
+        ('Veles', 'Владимирский Турклуб "ВЕЛЕС"'),
         ('IET', 'Институт экономики и туризма'),
-        ('BPS', 'Отряд имени Андрея Дубенского'),
+        ('ARH', 'Институт архитектуры, строительства и энергетики'),
+        ('vinogradova', 'Ирина Виноградова'),
+        ('School', 'МБОУ СОШ №19'),
     ]
 
     partner_slug = models.CharField(
         max_length=50, 
         choices=PARTNER_CHOICES, 
         default='vinogradova',
-        verbose_name="К какому партнеру относится?"
+        verbose_name="Партнер"
     )
-    title = models.CharField(max_length=200, blank=True, verbose_name="Подпись (необязательно)")
-    image = models.ImageField(upload_to='partners/', verbose_name="Фотография")
-    uploaded_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата загрузки")
+    title = models.CharField(max_length=200, blank=True, verbose_name="Подпись")
+
+    partner_description = models.TextField(
+        blank=True, 
+        verbose_name="Описание партнера", 
+        help_text="Достаточно заполнить только у ОДНОЙ фотографии партнера, чтобы текст появился в заголовке раздела."
+    )
+    
+    image = models.ImageField(upload_to='partners/photos/', verbose_name="Фото")
+    video_file = models.FileField(upload_to='partners/videos/', null=True, blank=True, verbose_name="Видео")
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    
+    image = models.ImageField(
+        upload_to='partners/photos/', 
+        verbose_name="Фото (или превью для видео)"
+    )
+    
+    video_file = models.FileField(
+        upload_to='partners/videos/',
+        null=True,
+        blank=True,
+        verbose_name="Видео файл (MP4/MOV)",
+        help_text="Оставьте пустым, если хотите добавить только фото",
+        validators=[FileExtensionValidator(allowed_extensions=['mp4', 'mov', 'webm'])]
+    )
+    
+    uploaded_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата добавления")
 
     class Meta:
-        verbose_name = "Фото партнера"
-        verbose_name_plural = "Галерея партнеров"
+        verbose_name = "Медиа партнера"
+        verbose_name_plural = "Медиа партнеров"
+        ordering = ['uploaded_at']
 
     def __str__(self):
         return f"{self.get_partner_slug_display()} - {self.title or self.id}"
@@ -46,13 +76,15 @@ class PartnerPhoto(models.Model):
 
         if self.image:
             img_path = self.image.path
-            img = Image.open(img_path)
-
-            max_size = (1600, 1600)
-            if img.width > 1600 or img.height > 1600:
-                img.thumbnail(max_size, Image.Resampling.LANCZOS)
-            
-            if img.mode in ("RGBA", "P"):
-                img = img.convert("RGB")
-
-            img.save(img_path, "JPEG", quality=75, optimize=True)
+            try:
+                img = Image.open(img_path)
+                
+                max_size = (1600, 1600)
+                if img.width > 1600 or img.height > 1600:
+                    img.thumbnail(max_size, Image.Resampling.LANCZOS)
+                
+                if img.mode in ("RGBA", "P"):
+                    img = img.convert("RGB")
+                img.save(img_path, "JPEG", quality=75, optimize=True)
+            except Exception as e:
+                print(f"Ошибка сжатия изображения: {e}")
